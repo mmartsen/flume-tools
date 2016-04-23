@@ -14,6 +14,11 @@ TwitterAgent.sources.PublicStream.consumerKey = %consumer_key%
 TwitterAgent.sources.PublicStream.consumerSecret = %consumer_secret%
 TwitterAgent.sources.PublicStream.accessToken = %access_token%
 TwitterAgent.sources.PublicStream.accessTokenSecret = %token_secret%
+TwitterAgent.sources.PublicStream.keywords = obama,@realDonaldTrump,#somehashtag
+# USA boundaries
+TwitterAgent.sources.PublicStream.locations = -179.231086,13.182335,179.859685,71.434357
+TwitterAgent.sources.PublicStream.language = en,de,fr
+TwitterAgent.sources.PublicStream.follow = 813286,1536791610,737904218
 
 TwitterAgent.sinks.HDFS.channel = MemCh
 TwitterAgent.sinks.HDFS.type = hdfs
