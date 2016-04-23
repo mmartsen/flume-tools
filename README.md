@@ -2,8 +2,8 @@
 Set of custom flume components to support various usage scenarios
 
 # Twitter Source usage
-# Flume conf file example
-
+## Flume conf file example
+```INI
 TwitterAgent.sources = PublicStream
 TwitterAgent.channels = MemCh
 TwitterAgent.sinks = HDFS
@@ -31,3 +31,4 @@ TwitterAgent.sinks.HDFS.hdfs.rollInterval = 600
 TwitterAgent.channels.MemCh.type = memory
 TwitterAgent.channels.MemCh.capacity = 10000
 TwitterAgent.channels.MemCh.transactionCapacity = 100
+```
