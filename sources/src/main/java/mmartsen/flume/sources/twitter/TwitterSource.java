@@ -41,9 +41,9 @@ public class TwitterSource extends AbstractSource implements EventDrivenSource, 
 	private String accessTokenSecret;
 	private TwitterSourceCounter sourceCounter;
 
-	private String[] keywords = new String[0];
-	private String[] langs = new String[0];
-	private String[] follow = new String[0];
+	private String[] keywords;
+	private String[] langs;
+	private long[] follow;
 	private double[][] locations;
 
 	/** The actual Twitter stream. It's set up to collect raw JSON data */
@@ -63,7 +63,7 @@ public class TwitterSource extends AbstractSource implements EventDrivenSource, 
 
 		keywords = csvToArray.apply(context.getString(TwitterSourceConstants.KEYWORDS_KEY, ""));
 		langs = csvToArray.apply(context.getString(TwitterSourceConstants.LANGS_KEY, ""));
-		follow = csvToArray.apply(context.getString(TwitterSourceConstants.FOLLOWS_KEY, ""));
+		follow = csvToArrayLong.apply(context.getString(TwitterSourceConstants.FOLLOWS_KEY, ""));
 		processLocations(context.getString(TwitterSourceConstants.LOCATIONS_KEY, ""));
 
 		ConfigurationBuilder cb = new ConfigurationBuilder();
@@ -71,8 +71,7 @@ public class TwitterSource extends AbstractSource implements EventDrivenSource, 
 		cb.setOAuthConsumerSecret(consumerSecret);
 		cb.setOAuthAccessToken(accessToken);
 		cb.setOAuthAccessTokenSecret(accessTokenSecret);
-		cb.setJSONStoreEnabled(true); // important to convert status to raw json
-										// format
+		cb.setJSONStoreEnabled(true); // important to convert status to raw json format
 		cb.setIncludeEntitiesEnabled(true);
 
 		twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
@@ -119,8 +118,7 @@ public class TwitterSource extends AbstractSource implements EventDrivenSource, 
 			}
 
 			// This listener will ignore everything except for new tweets
-			public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
-			}
+			public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {}
 
 			public void onTrackLimitationNotice(int numberOfLimitedStatuses) {
 				logger.warn("Twitter stream get out of 1% of firehose. Number of tweets removed so far: "
@@ -128,8 +126,7 @@ public class TwitterSource extends AbstractSource implements EventDrivenSource, 
 				sourceCounter.setLimitedStatusesCount(numberOfLimitedStatuses);
 			}
 
-			public void onScrubGeo(long userId, long upToStatusId) {
-			}
+			public void onScrubGeo(long userId, long upToStatusId) {}
 
 			public void onException(Exception ex) {
 				logger.warn("Twitter exception occured: " + ex.getMessage());
@@ -157,7 +154,7 @@ public class TwitterSource extends AbstractSource implements EventDrivenSource, 
 			FilterQuery query = new FilterQuery();
 			if (keywords.length>0) query.track(keywords);
 			if (langs.length>0) query.language(langs);
-			//if (follow.length>0) query.follow(follow);
+			if (follow.length>0) query.follow(follow);
 			if (locations.length>0) query.locations(locations);
 			twitterStream.filter(query);
 		}
@@ -200,6 +197,18 @@ public class TwitterSource extends AbstractSource implements EventDrivenSource, 
 			out = csvSource.split(",");
 			for (int i = 0; i < out.length; i++) {
 				out[i] = out[i].trim();
+			}
+		}
+		return out;
+	};
+	
+	private Function<String, long[]> csvToArrayLong = csvSource -> {
+		long [] out = new long[0];
+		String [] outStr = new String[0];
+		if (csvSource.trim().length() > 0) {
+			outStr = csvSource.split(",");
+			for (int i = 0; i < outStr.length; i++) {
+				out[i] = Long.parseLong(outStr[i].trim());
 			}
 		}
 		return out;
