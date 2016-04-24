@@ -3,7 +3,7 @@ package mmartsen.flume.sources.twitter;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.flume.instrumentation.SourceCounter;
 
-public class TwitterSourceCounter extends SourceCounter {
+public class TwitterSourceCounter extends SourceCounter implements TwitterSourceCounterMBean {
 
 	private static final String COUNTER_EVENTS_REJECTED = "src.events.rejected";
 	private static final String COUNTER_STALL_WARNINGS = "src.stallwarnings.count";
@@ -35,5 +35,25 @@ public class TwitterSourceCounter extends SourceCounter {
 	
 	public long incrementEventsRejectedCount() {
 		return increment(COUNTER_EVENTS_REJECTED);
+	}
+
+	@Override
+	public long getEventRejectedCount() {
+		return get(COUNTER_EVENTS_REJECTED);
+	}
+
+	@Override
+	public long getStallWarningsCount() {
+		return get(COUNTER_STALL_WARNINGS);
+	}
+
+	@Override
+	public long getTwitterExceptionsCount() {
+		return get(COUNTER_TWITTER_EXCEPTIONS);
+	}
+
+	@Override
+	public long getLimitedStatusesCount() {
+		return get(COUNTER_LIMITED_STATUSES);
 	}
 }

@@ -2,7 +2,6 @@ package mmartsen.flume.sources.twitter;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 import org.apache.flume.ChannelException;
 import org.apache.flume.Context;
@@ -61,9 +60,9 @@ public class TwitterSource extends AbstractSource implements EventDrivenSource, 
 		accessToken = context.getString(TwitterSourceConstants.ACCESS_TOKEN_KEY);
 		accessTokenSecret = context.getString(TwitterSourceConstants.ACCESS_TOKEN_SECRET_KEY);
 
-		keywords = csvToArray.apply(context.getString(TwitterSourceConstants.KEYWORDS_KEY, ""));
-		langs = csvToArray.apply(context.getString(TwitterSourceConstants.LANGS_KEY, ""));
-		follow = csvToArrayLong.apply(context.getString(TwitterSourceConstants.FOLLOWS_KEY, ""));
+		keywords = csvToArray(context.getString(TwitterSourceConstants.KEYWORDS_KEY, ""));
+		langs = csvToArray(context.getString(TwitterSourceConstants.LANGS_KEY, ""));
+		follow = csvToArrayLong(context.getString(TwitterSourceConstants.FOLLOWS_KEY, ""));
 		processLocations(context.getString(TwitterSourceConstants.LOCATIONS_KEY, ""));
 
 		ConfigurationBuilder cb = new ConfigurationBuilder();
@@ -191,29 +190,28 @@ public class TwitterSource extends AbstractSource implements EventDrivenSource, 
 		this.locations = list;
 	}
 	
-	private Function<String, String[]> csvToArray = csvSource -> {
+	private String[] csvToArray(String in) {
 		String [] out = new String[0];
-		if (csvSource.trim().length() > 0) {
-			out = csvSource.split(",");
+		if (in.trim().length() > 0) {
+			out = in.split(",");
 			for (int i = 0; i < out.length; i++) {
 				out[i] = out[i].trim();
 			}
 		}
 		return out;
-	};
+	}
 	
-	private Function<String, long[]> csvToArrayLong = csvSource -> {
-		long [] out = new long[0];
-		String [] outStr = new String[0];
-		if (csvSource.trim().length() > 0) {
-			outStr = csvSource.split(",");
+	private long[] csvToArrayLong(String in) {
+		long[] out = new long[0];
+		if (in.trim().length() > 0) {
+			String [] outStr = in.split(",");
 			for (int i = 0; i < outStr.length; i++) {
 				out[i] = Long.parseLong(outStr[i].trim());
 			}
 		}
 		return out;
-	};
-
+	}
+	
 	private class TwitterSourceConstants {
 		public static final String CONSUMER_KEY_KEY = "consumerKey";
 		public static final String CONSUMER_SECRET_KEY = "consumerSecret";
